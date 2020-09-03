@@ -23,7 +23,6 @@ public class WebShopApp {
         System.out.println("Changing price for Iphone 9: ");
         System.out.println(productToUpdate);
         productToUpdate.setPrice(BigDecimal.valueOf(650.0));
-        System.out.println();
         System.out.println(productService.update(productToUpdate));
 
         productService.delete(productToUpdate);
