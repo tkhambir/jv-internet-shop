@@ -21,18 +21,18 @@ public class WebShopApp {
         productService.create(new Product("Iphone 9", 800));
         System.out.println("All products: ");
 
-        productService.getAllProducts().forEach(System.out::println);
+        productService.getAll().forEach(System.out::println);
 
-        Product productToUpdate = productService.getById(3L);
+        Product productToUpdate = productService.get(3L);
         System.out.println("Changing price for Iphone 9: ");
         System.out.println(productToUpdate);
         productToUpdate.setPrice(BigDecimal.valueOf(650.0));
         System.out.println(productService.update(productToUpdate));
 
-        productService.delete(productToUpdate);
+        productService.delete(3L);
         System.out.println("All products after removing Iphone 9: ");
 
-        productService.getAllProducts().forEach(System.out::println);
+        productService.getAll().forEach(System.out::println);
 
         System.out.println();
 
@@ -66,11 +66,11 @@ public class WebShopApp {
         shoppingCartService.create(new ShoppingCart(2L));
 
         shoppingCartService.addProduct(shoppingCartService
-                .getByUserId(1L), productService.getById(1L));
+                .getByUserId(1L), productService.get(1L));
         shoppingCartService.addProduct(shoppingCartService
-                .getByUserId(1L), productService.getById(2L));
+                .getByUserId(1L), productService.get(2L));
         shoppingCartService.addProduct(shoppingCartService
-                .getByUserId(2L), productService.getById(1L));
+                .getByUserId(2L), productService.get(1L));
 
         System.out.println("Shopping cart for User1: ");
         System.out.println(shoppingCartService.getByUserId(1L));
@@ -79,14 +79,14 @@ public class WebShopApp {
         System.out.println("Shopping cart for User1 after removing iphone X: ");
         System.out.println(shoppingCartService.getByUserId(1L));
         shoppingCartService.deleteProduct(shoppingCartService
-                .getByUserId(1L),productService.getById(1L));
+                .getByUserId(1L),productService.get(1L));
         System.out.println(shoppingCartService.getByUserId(1L));
         System.out.println();
 
         OrderService orderService = (OrderService) injector.getInstance(OrderService.class);
         orderService.completeOrder(shoppingCartService.getByUserId(1L));
         shoppingCartService.addProduct(shoppingCartService.getByUserId(1L),
-                productService.getById(2L));
+                productService.get(2L));
         orderService.completeOrder(shoppingCartService.getByUserId(1L));
         orderService.completeOrder(shoppingCartService.getByUserId(2L));
 
