@@ -4,6 +4,8 @@ import com.internet.shop.dao.ShoppingCartDao;
 import com.internet.shop.db.Storage;
 import com.internet.shop.lib.Dao;
 import com.internet.shop.model.ShoppingCart;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -13,6 +15,18 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
     public ShoppingCart create(ShoppingCart shoppingCart) {
         Storage.addShoppingCart(shoppingCart);
         return shoppingCart;
+    }
+
+    @Override
+    public Optional<ShoppingCart> get(Long id) {
+        return Storage.shoppingCarts.stream()
+                .filter(shoppingCart -> shoppingCart.getId().equals(id))
+                .findFirst();
+    }
+
+    @Override
+    public List<ShoppingCart> getAll() {
+        return new ArrayList<>(Storage.shoppingCarts);
     }
 
     @Override
