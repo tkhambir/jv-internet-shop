@@ -28,8 +28,6 @@ public class AddProductController extends HttpServlet {
         String price = req.getParameter("price");
         Product product = new Product(name, Double.parseDouble(price));
         productService.create(product);
-        List<Product> allProducts = productService.getAll();
-        req.setAttribute("products", allProducts);
-        req.getRequestDispatcher("/WEB-INF/views/products/all.jsp").forward(req,resp);
+        resp.sendRedirect(req.getContextPath() + "/products");
     }
 }
