@@ -5,14 +5,11 @@ import com.internet.shop.model.Product;
 import com.internet.shop.model.ShoppingCart;
 import com.internet.shop.service.ProductService;
 import com.internet.shop.service.ShoppingCartService;
-import com.internet.shop.service.UserService;
-
+import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.List;
 
 public class AddProductToCartController extends HttpServlet {
     private static final Long USER_ID = 1L;
@@ -24,7 +21,8 @@ public class AddProductToCartController extends HttpServlet {
             .getInstance(ShoppingCartService.class);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
         Long productId = Long.valueOf(req.getParameter("productId"));
         ShoppingCart shoppingCart = shoppingCartService.getByUserId(USER_ID);
         Product product = productService.get(productId);
