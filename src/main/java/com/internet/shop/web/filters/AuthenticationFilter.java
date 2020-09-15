@@ -13,13 +13,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class AuthenticationFilter implements Filter {
-
+    private static final String USER_ID = "userId";
     private static Injector injector = Injector.getInstance("com.internet.shop");
     private final UserService userService = (UserService) injector.getInstance(UserService.class);
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
     }
 
     @Override
@@ -34,7 +33,7 @@ public class AuthenticationFilter implements Filter {
             return;
         }
 
-        Long userId = (Long) req.getSession().getAttribute("userId");
+        Long userId = (Long) req.getSession().getAttribute(USER_ID);
         if (userId == null || userService.get(userId) == null) {
             resp.sendRedirect("/login");
             return;
@@ -45,6 +44,5 @@ public class AuthenticationFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 }
