@@ -9,8 +9,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class GetAllUserOrdersController extends HttpServlet {
+    private static final String USER_ID = "userId";
     private static Injector injector = Injector.getInstance("com.internet.shop");
     private final OrderService orderService = (OrderService) injector
             .getInstance(OrderService.class);
@@ -18,7 +20,9 @@ public class GetAllUserOrdersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        List<Order> orders = orderService.getAll();
+        HttpSession session = req.getSession();
+        Long userId = (Long) session.getAttribute(USER_ID);
+        List<Order> orders = orderService.getUserOrders(userId);
         req.setAttribute("orders", orders);
         req.getRequestDispatcher("/WEB-INF/views/orders/user-orders.jsp").forward(req,resp);
     }

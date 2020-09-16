@@ -9,10 +9,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class GetCartController extends HttpServlet {
-    private static final Long USER_ID = 1L;
-
+    private static final String USER_ID = "userId";
     private static final Injector injector = Injector.getInstance("com.internet.shop");
     private final ShoppingCartService shoppingCartService =
             (ShoppingCartService) injector.getInstance(ShoppingCartService.class);
@@ -20,7 +20,9 @@ public class GetCartController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        List<Product> products = shoppingCartService.getByUserId(USER_ID).getProducts();
+        HttpSession session = req.getSession();
+        Long userId = (Long) session.getAttribute(USER_ID);
+        List<Product> products = shoppingCartService.getByUserId(userId).getProducts();
         req.setAttribute("products", products);
         req.getRequestDispatcher("/WEB-INF/views/shopping-cart/cart.jsp").forward(req,resp);
     }
