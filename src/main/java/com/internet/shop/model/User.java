@@ -1,6 +1,5 @@
 package com.internet.shop.model;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class User {
