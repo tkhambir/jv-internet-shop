@@ -6,13 +6,12 @@ import com.internet.shop.model.Role;
 import com.internet.shop.model.User;
 import com.internet.shop.service.ProductService;
 import com.internet.shop.service.UserService;
-
+import java.io.IOException;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Set;
 
 public class InjectDataController extends HttpServlet {
     private static Injector injector = Injector.getInstance("com.internet.shop");
