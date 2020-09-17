@@ -21,7 +21,6 @@ public class AuthorizationFilter implements Filter {
     private static final String USER_ID = "userId";
     private static final Injector injector = Injector.getInstance("com.internet.shop");
     private final UserService userService = (UserService) injector.getInstance(UserService.class);
-
     private final Map<String, List<Role.RoleName>> protectedUrls = new HashMap<>();
 
     @Override
@@ -32,6 +31,7 @@ public class AuthorizationFilter implements Filter {
         protectedUrls.put("/admin/orders", List.of(Role.RoleName.ADMIN));
         protectedUrls.put("/users/delete", List.of(Role.RoleName.ADMIN));
         protectedUrls.put("/products/add", List.of(Role.RoleName.ADMIN));
+        protectedUrls.put("/products/delete", List.of(Role.RoleName.ADMIN));
         protectedUrls.put("/orders/add", List.of(Role.RoleName.USER));
         protectedUrls.put("/orders", List.of(Role.RoleName.USER));
         protectedUrls.put("/cart", List.of(Role.RoleName.USER));
@@ -46,7 +46,7 @@ public class AuthorizationFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
         String requestedUrl = req.getServletPath();
 
-        if (protectedUrls.get(requestedUrl) == null) {
+        if (!protectedUrls.containsKey(requestedUrl)) {
             chain.doFilter(req, resp);
             return;
         }
@@ -61,7 +61,6 @@ public class AuthorizationFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 
     private boolean isAuthorized(User user, List<Role.RoleName> authorizedRoles) {
