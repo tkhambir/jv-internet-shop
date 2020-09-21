@@ -19,7 +19,7 @@ public class ProductDaoJdbcImpl implements ProductDao {
 
     @Override
     public Product create(Product product) {
-        String query = "INSERT INTO PRODUCTS(NAME, PRICE) VALUES (?, ?)";
+        String query = "INSERT INTO products(name, price) VALUES (?, ?)";
         try (Connection connection = ConnectionUtil.getConnection()) {
             PreparedStatement statement = connection
                     .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
@@ -40,18 +40,14 @@ public class ProductDaoJdbcImpl implements ProductDao {
 
     @Override
     public Optional<Product> get(Long id) {
-        String query = "SELECT * FROM PRODUCTS WHERE ID = ? AND DELETED = false;";
+        String query = "SELECT * FROM products WHERE id = ? AND deleted = false;";
 
         try (Connection connection = ConnectionUtil.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                String name = resultSet.getString("NAME");
-                double price = resultSet.getDouble("PRICE");
-                Product product = new Product(name, price);
-                product.setId(id);
-                return Optional.of(product);
+                return Optional.of(getProduct(resultSet));
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -62,19 +58,14 @@ public class ProductDaoJdbcImpl implements ProductDao {
 
     @Override
     public List<Product> getAll() {
-        String query = "SELECT * FROM PRODUCTS WHERE DELETED = false;";
+        String query = "SELECT * FROM products WHERE deleted = false;";
         List<Product> products = new ArrayList<>();
 
         try (Connection connection = ConnectionUtil.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                long id = resultSet.getLong("ID");
-                String name = resultSet.getString("NAME");
-                double price = resultSet.getDouble("PRICE");
-                Product product = new Product(name, price);
-                product.setId(id);
-                products.add(product);
+                products.add(getProduct(resultSet));
             }
             return products;
         } catch (SQLException e) {
@@ -84,7 +75,7 @@ public class ProductDaoJdbcImpl implements ProductDao {
 
     @Override
     public Product update(Product product) {
-        String query = "UPDATE PRODUCTS SET NAME = ?, PRICE = ? WHERE ID = ? AND DELETED = false;";
+        String query = "UPDATE products SET name = ?, price = ? WHERE id = ? AND deleted = false;";
 
         try (Connection connection = ConnectionUtil.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -101,16 +92,24 @@ public class ProductDaoJdbcImpl implements ProductDao {
 
     @Override
     public boolean delete(Long id) {
-        String query = "UPDATE PRODUCTS SET DELETED = true WHERE ID = ?;";
+        String query = "UPDATE products SET deleted = true WHERE id = ?;";
 
         try (Connection connection = ConnectionUtil.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, id);
-            statement.executeUpdate();
-            return true;
+            return statement.executeUpdate() == 1;
         } catch (SQLException e) {
             throw new DataProcessingException("Delete of product with id="
                     + id + " is failed", e);
         }
+    }
+
+    private Product getProduct(ResultSet resultSet) throws SQLException {
+        long id = resultSet.getLong("id");
+        String name = resultSet.getString("name");
+        double price = resultSet.getDouble("price");
+        Product product = new Product(name, price);
+        product.setId(id);
+        return product;
     }
 }
