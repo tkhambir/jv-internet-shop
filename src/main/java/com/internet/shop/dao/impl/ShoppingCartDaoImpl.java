@@ -2,14 +2,13 @@ package com.internet.shop.dao.impl;
 
 import com.internet.shop.dao.ShoppingCartDao;
 import com.internet.shop.db.Storage;
-import com.internet.shop.lib.Dao;
+import com.internet.shop.model.Product;
 import com.internet.shop.model.ShoppingCart;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
-@Dao
 public class ShoppingCartDaoImpl implements ShoppingCartDao {
     @Override
     public ShoppingCart create(ShoppingCart shoppingCart) {
@@ -42,6 +41,20 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
         return Storage.shoppingCarts.stream()
                 .filter(shoppingCart -> shoppingCart.getUserId().equals(userId))
                 .findFirst();
+    }
+
+    @Override
+    public ShoppingCart addProduct(ShoppingCart cart, Product product) {
+        return null;
+    }
+
+    @Override
+    public void deleteProduct(ShoppingCart cart, Product product) {
+    }
+
+    @Override
+    public void removeAllProducts(ShoppingCart cart) {
+
     }
 
     @Override

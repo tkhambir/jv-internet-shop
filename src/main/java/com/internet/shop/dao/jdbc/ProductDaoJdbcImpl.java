@@ -20,9 +20,10 @@ public class ProductDaoJdbcImpl implements ProductDao {
     @Override
     public Product create(Product product) {
         String query = "INSERT INTO products(name, price) VALUES (?, ?)";
-        try (Connection connection = ConnectionUtil.getConnection()) {
-            PreparedStatement statement = connection
-                    .prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        try (Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement statement = connection
+                        .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+
             statement.setString(1, product.getName());
             statement.setDouble(2, product.getPrice().doubleValue());
             statement.executeUpdate();
@@ -42,8 +43,8 @@ public class ProductDaoJdbcImpl implements ProductDao {
     public Optional<Product> get(Long id) {
         String query = "SELECT * FROM products WHERE id = ? AND deleted = false;";
 
-        try (Connection connection = ConnectionUtil.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
@@ -61,8 +62,8 @@ public class ProductDaoJdbcImpl implements ProductDao {
         String query = "SELECT * FROM products WHERE deleted = false;";
         List<Product> products = new ArrayList<>();
 
-        try (Connection connection = ConnectionUtil.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 products.add(getProduct(resultSet));
@@ -77,8 +78,9 @@ public class ProductDaoJdbcImpl implements ProductDao {
     public Product update(Product product) {
         String query = "UPDATE products SET name = ?, price = ? WHERE id = ? AND deleted = false;";
 
-        try (Connection connection = ConnectionUtil.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
+
             statement.setString(1, product.getName());
             statement.setDouble(2, product.getPrice().doubleValue());
             statement.setLong(3, product.getId());
@@ -94,8 +96,8 @@ public class ProductDaoJdbcImpl implements ProductDao {
     public boolean delete(Long id) {
         String query = "UPDATE products SET deleted = true WHERE id = ?;";
 
-        try (Connection connection = ConnectionUtil.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
             return statement.executeUpdate() == 1;
         } catch (SQLException e) {
@@ -108,8 +110,6 @@ public class ProductDaoJdbcImpl implements ProductDao {
         long id = resultSet.getLong("id");
         String name = resultSet.getString("name");
         double price = resultSet.getDouble("price");
-        Product product = new Product(name, price);
-        product.setId(id);
-        return product;
+        return new Product(id, name, price);
     }
 }
