@@ -22,26 +22,28 @@ public class ShoppingCardDaoJdbcImpl implements ShoppingCartDao {
         String query = "SELECT sc.id, sc.fk_user_id, p.id as priceId, p.name, p.price "
                 + "FROM products p  "
                 + "JOIN shopping_cart_products scp ON p.id = scp.product_id "
-                + "RIGHT JOIN shopping_cart sc  ON sc.id = scp.cart_id WHERE sc.fk_user_id = ?";
+                + "RIGHT JOIN shopping_cart sc  ON sc.id = scp.cart_id "
+                + "WHERE p.deleted = false AND sc.fk_user_id = ?";
 
         try (Connection connection = ConnectionUtil.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
-            ResultSet rs = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
             List<Product> products = new ArrayList<>();
             ShoppingCart shoppingCart = null;
 
-            while (rs.next()) {
-                if (rs.isLast()) {
-                    shoppingCart = getCart(rs);
+            while (resultSet.next()) {
+                if (resultSet.isLast()) {
+                    shoppingCart = getCart(resultSet);
                     shoppingCart.setProducts(products);
                 }
 
-                Long priceId = rs.getLong("priceId");
+                Long priceId = resultSet.getLong("priceId");
 
-                if (!rs.wasNull()) {
-                    products.add(new Product(priceId, rs.getString("name"), rs.getDouble("price")));
+                if (!resultSet.wasNull()) {
+                    products.add(new Product(priceId, resultSet
+                            .getString("name"), resultSet.getDouble("price")));
                 }
             }
 
@@ -76,23 +78,24 @@ public class ShoppingCardDaoJdbcImpl implements ShoppingCartDao {
     public Optional<ShoppingCart> get(Long id) {
         String query = "SELECT sc.id, sc.fk_user_id, name, price FROM products p  "
                 + "JOIN shopping_cart_products scp ON p.id = scp.product_id "
-                + "RIGHT JOIN shopping_cart sc  ON sc.id = scp.cart_id WHERE scp.cart_id = ?";
+                + "RIGHT JOIN shopping_cart sc  ON sc.id = scp.cart_id "
+                + "WHERE p.deleted = false AND scp.cart_id = ?";
 
         try (Connection connection = ConnectionUtil.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
-            ResultSet rs = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery();
 
             List<Product> products = new ArrayList<>();
             ShoppingCart shoppingCart = null;
 
-            while (rs.next()) {
-                if (rs.isLast()) {
-                    shoppingCart = getCart(rs);
+            while (resultSet.next()) {
+                if (resultSet.isLast()) {
+                    shoppingCart = getCart(resultSet);
                     shoppingCart.setProducts(products);
                 }
-                products.add(new Product(rs.getLong("id"),
-                        rs.getString("name"), rs.getDouble("price")));
+                products.add(new Product(resultSet.getLong("id"),
+                        resultSet.getString("name"), resultSet.getDouble("price")));
             }
 
             return Optional.ofNullable(shoppingCart);
@@ -105,7 +108,7 @@ public class ShoppingCardDaoJdbcImpl implements ShoppingCartDao {
     @Override
     public List<ShoppingCart> getAll() {
         List<ShoppingCart> shoppingCarts = new ArrayList<>();
-        String query = "SELECT * FROM shopping_cart WHERE deleted = FALSE";
+        String query = "SELECT * FROM shopping_cart WHERE deleted = false";
         try (Connection connection = ConnectionUtil.getConnection();
                 PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();

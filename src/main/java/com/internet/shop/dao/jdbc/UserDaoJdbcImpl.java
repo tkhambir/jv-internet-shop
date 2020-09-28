@@ -53,7 +53,7 @@ public class UserDaoJdbcImpl implements UserDao {
             if (resultSet.next()) {
                 user.setId(resultSet.getLong("GENERATED_KEY"));
             }
-            return addRoles(user);
+            return addRoles(user, connection);
         } catch (SQLException e) {
             throw new DataProcessingException("Creating user"
                     + user + " is failed", e);
@@ -109,7 +109,7 @@ public class UserDaoJdbcImpl implements UserDao {
             statement.setLong(4, user.getId());
             statement.executeUpdate();
             deleteRoles(user.getId());
-            return addRoles(user);
+            return addRoles(user, connection);
         } catch (SQLException e) {
             throw new DataProcessingException("Updating user with id="
                     + user.getId() + " is failed", e);
@@ -176,18 +176,14 @@ public class UserDaoJdbcImpl implements UserDao {
         }
     }
 
-    private User addRoles(User user) {
+    private User addRoles(User user, Connection connection) throws SQLException {
         String query = "INSERT INTO user_roles(user_id, role_id) "
                 + "VALUES(?,(SELECT id FROM roles WHERE role_name = ?))";
-        try (Connection connection = ConnectionUtil.getConnection();
-                PreparedStatement statement = connection.prepareStatement(query)) {
-            for (Role role : user.getRoles()) {
-                statement.setLong(1, user.getId());
-                statement.setString(2, role.getRoleName().name());
-                statement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new DataProcessingException("Couldn't update role of the user " + user, e);
+        PreparedStatement statement = connection.prepareStatement(query);
+        for (Role role : user.getRoles()) {
+            statement.setLong(1, user.getId());
+            statement.setString(2, role.getRoleName().name());
+            statement.executeUpdate();
         }
         return user;
     }
