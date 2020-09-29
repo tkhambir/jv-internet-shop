@@ -28,7 +28,7 @@ public class OrderDaoJdbcImpl implements OrderDao {
             statement.setLong(1, userId);
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                orders.add(getOrder(resultSet));
+                orders.add(getOrderFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get orders for user with id " + userId, e);
@@ -54,7 +54,7 @@ public class OrderDaoJdbcImpl implements OrderDao {
     }
 
     @Override
-    public void deleteProduct(Order order, Product product) {
+    public void removeProduct(Order order, Product product) {
         String query = "DELETE FROM orders_products WHERE order_id = ? "
                 + "AND product_id = ? LIMIT 1;";
         try (Connection connection = ConnectionUtil.getConnection();
@@ -81,11 +81,11 @@ public class OrderDaoJdbcImpl implements OrderDao {
             if (resultSet.next()) {
                 order.setId(resultSet.getLong("GENERATED_KEY"));
             }
-            return addProducts(order);
         } catch (SQLException e) {
             throw new DataProcessingException("Creating order"
                     + order + " is failed", e);
         }
+        return addProducts(order);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class OrderDaoJdbcImpl implements OrderDao {
 
             while (resultSet.next()) {
                 if (resultSet.isLast()) {
-                    order = getOrder(resultSet);
+                    order = getOrderFromResultSet(resultSet);
                     order.setProducts(products);
                 }
 
@@ -124,7 +124,7 @@ public class OrderDaoJdbcImpl implements OrderDao {
                 PreparedStatement statement = connection.prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                orders.add(getOrder(resultSet));
+                orders.add(getOrderFromResultSet(resultSet));
             }
         } catch (SQLException e) {
             throw new DataProcessingException("Can't get orders from DB", e);
@@ -194,7 +194,7 @@ public class OrderDaoJdbcImpl implements OrderDao {
         }
     }
 
-    private Order getOrder(ResultSet resultSet) throws SQLException {
+    private Order getOrderFromResultSet(ResultSet resultSet) throws SQLException {
         Long orderId = resultSet.getLong("id");
         Long userId = resultSet.getLong("fk_user_id");
         Order order = new Order(userId);

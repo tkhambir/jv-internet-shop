@@ -29,7 +29,6 @@ public class ShoppingCardDaoJdbcImpl implements ShoppingCartDao {
                 PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
             ResultSet resultSet = statement.executeQuery();
-
             List<Product> products = new ArrayList<>();
             ShoppingCart shoppingCart = null;
 
@@ -38,15 +37,12 @@ public class ShoppingCardDaoJdbcImpl implements ShoppingCartDao {
                     shoppingCart = getCart(resultSet);
                     shoppingCart.setProducts(products);
                 }
-
                 Long priceId = resultSet.getLong("priceId");
-
                 if (!resultSet.wasNull()) {
                     products.add(new Product(priceId, resultSet
                             .getString("name"), resultSet.getDouble("price")));
                 }
             }
-
             return Optional.ofNullable(shoppingCart);
         } catch (SQLException e) {
             throw new DataProcessingException("Getting cart by user id="

@@ -10,5 +10,5 @@ public interface OrderDao extends GenericDao<Order, Long> {
 
     Order addProduct(Order order, Product product);
 
-    void deleteProduct(Order order, Product product);
+    void removeProduct(Order order, Product product);
 }
