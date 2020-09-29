@@ -1,5 +1,6 @@
 package com.internet.shop.model;
 
+import java.util.Arrays;
 import java.util.Set;
 
 public class User {
@@ -7,12 +8,21 @@ public class User {
     private String name;
     private String login;
     private String password;
+    private byte[] salt;
     private Set<Role> roles;
 
     public User(String name, String login, String password) {
         this.name = name;
         this.login = login;
         this.password = password;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
     }
 
     public Long getId() {
@@ -62,6 +72,8 @@ public class User {
                 + ", name='" + name + '\''
                 + ", login='" + login + '\''
                 + ", password='" + password + '\''
+                + ", salt=" + Arrays.toString(salt)
+                + ", roles=" + roles
                 + '}';
     }
 }

@@ -5,6 +5,7 @@ CREATE TABLE users (
     name         VARCHAR(256)                        NOT NULL,
     login        VARCHAR(256)                NOT NULL, UNIQUE,
     password     VARCHAR(256)                        NOT NULL,
+    salt         VARBINARY(16)                       NOT NULL,
     deleted      BOOLEAN               NOT NULL DEFAULT false
 );
 
