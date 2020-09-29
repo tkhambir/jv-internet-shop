@@ -29,7 +29,9 @@ public class UserDaoJdbcImpl implements UserDao {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                return Optional.of(getUser(resultSet));
+                User user = getUser(resultSet);
+                user.setRoles(getRoles(user.getId(), connection));
+                return Optional.of(user);
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -71,7 +73,9 @@ public class UserDaoJdbcImpl implements UserDao {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                return Optional.of(getUser(resultSet));
+                User user = getUser(resultSet);
+                user.setRoles(getRoles(user.getId(), connection));
+                return Optional.of(user);
             }
             return Optional.empty();
         } catch (SQLException e) {
@@ -89,7 +93,9 @@ public class UserDaoJdbcImpl implements UserDao {
                 PreparedStatement statement = connection.prepareStatement(query);) {
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                users.add(getUser(resultSet));
+                User user = getUser(resultSet);
+                user.setRoles(getRoles(user.getId(), connection));
+                users.add(user);
             }
             return users;
         } catch (SQLException e) {
@@ -154,15 +160,13 @@ public class UserDaoJdbcImpl implements UserDao {
         User user = new User(name, login, password);
         user.setSalt(salt);
         user.setId(id);
-        user.setRoles(getRoles(id));
         return user;
     }
 
-    private Set<Role> getRoles(Long userId) {
+    private Set<Role> getRoles(Long userId, Connection connection) {
         String query = "SELECT * FROM roles r JOIN user_roles ur ON r.id = ur.role_id "
                 + "WHERE ur.user_id = ?";
-        try (Connection connection = ConnectionUtil.getConnection();
-                PreparedStatement statement = connection.prepareStatement(query)) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, userId);
             ResultSet resultSet = statement.executeQuery();
             Set<Role> roles = new HashSet<>();

@@ -30,8 +30,4 @@ public class HashUtil {
         }
         return hashedPassword.toString();
     }
-
-    public static boolean isValid(String password, User user) {
-        return hashPassword(password, user.getSalt()).equals(user.getPassword());
-    }
 }
